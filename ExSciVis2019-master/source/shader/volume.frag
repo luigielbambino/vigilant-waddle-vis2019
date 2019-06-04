@@ -47,6 +47,40 @@ get_sample_data(vec3 in_sampling_pos)
 
 }
 
+// Here we want to define the vec3 for the gradient (get_gradient - from sampling_pos)
+vec3
+get_gradient (vec3 sampling_pos) {
+	float stepsize_x = 1.0/volume_dimensions.x;
+	float stepsize_y = 1.0/volume_dimensions.y;
+	float stepsize_z = 1.0/volume_dimensions.z;
+
+	float fx = get_sample_data(vec3(sampling_pos.x + stepsize_x, sampling_pos.y, sampling_pos.z));
+	float bx = get_sample_data(vec3(sampling_pos.x - stepsize_x, sampling_pos.y, sampling_pos.z));
+
+	float cdx = fx - bx;
+
+	float fy = get_sample_data(vec3(sampling_pos.x, sampling_pos.y + stepsize_y, sampling_pos.z)); 
+	float by = get_sample_data(vec3(sampling_pos.x, sampling_pos.y - stepsize_y, sampling_pos.z));
+	float cdy = fy - by;
+	
+	float fz = get_sample_data(vec3(sampling_pos.x, sampling_pos.y, sampling_pos.z + stepsize_z));
+	float bz = get_sample_data(vec3(sampling_pos.x, sampling_pos.y, sampling_pos.z - stepsize_z));
+	float cdz = fz - bz;
+
+	// Define the gradient vector
+	vec3 grad;
+	grad.x = cdx;
+	grad.y = cdy;
+	grad.z = cdz;
+	
+	return grad;
+}
+
+// Here we want to define the vec3 for the lighting (get_illumination)
+vec3
+get_illumination (vec3 sampling_pos) {
+}
+
 void main()
 {
     /// One step trough the volume
@@ -96,21 +130,43 @@ void main()
 #if TASK == 11
     // the traversal loop,
     // termination when the sampling position is outside volume boundarys
-    // another termination condition for early ray termination is added
-    while (inside_volume)
+    // another termination condition for early ray termination is added	    
+	
+	// ASSIGNMENT 1 - Point 1
+	// Implement average intensity projection
+	vec4 avg_val = vec4(0.0, 0.0, 0.0, 0.0);
+	vec4 total_val = vec4(0.0, 0.0, 0.0, 0.0);
+	int count = 0;
+
+	// Got error since we haven't declared & defined get_illumination() lol
+	// Need to write that (see the codes above, I put some comments to declare the vec3 functions)
+	
+
+while (inside_volume)
     {      
         // get sample
-        float s = get_sample_data(sampling_pos);
+        float s = get_sample_data(sampling_pos);	
 
         // dummy code
-        dst = vec4(sampling_pos, 1.0);
+        // dst = vec4(sampling_pos, 1.0);
+
+	// Get color & opacity
+	vec4 color = texture(transfer_texture, vec2(s, s));
         
         // increment the ray sampling position
         sampling_pos  += ray_increment;
 
         // update the loop termination condition
         inside_volume  = inside_volume_bounds(sampling_pos);
+	
+	// Total value increases with color
+	total_val += color;
+	count++;
     }
+
+	// Calculate the average of vector
+	avg_val = total_val/count;
+	dst = avg_val;
 #endif
     
 #if TASK == 12 || TASK == 13
