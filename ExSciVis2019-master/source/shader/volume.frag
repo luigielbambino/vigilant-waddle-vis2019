@@ -47,6 +47,65 @@ get_sample_data(vec3 in_sampling_pos)
 
 }
 
+/*
+// Compute gradient vector
+vec3 get_gradient(vec3 sampling_pos) {
+    float stepsize_x = 1.0 / volume_dimensions.x;
+    float stepsize_y = 1.0 / volume_dimensions.y;
+    float stepsize_z = 1.0 / volume_dimensions.z;
+
+    float fx = get_sample_data(vec3(sampling_pos.x + stepsize_x, sampling_pos.y, sampling_pos.z));
+    float bx = get_sample_data(vec3(sampling_pos.x - stepsize_x, sampling_pos.y, sampling_pos.z));
+    float cdx = fx - bx;
+
+    float fy = get_sample_data(vec3(sampling_pos.x + sampling_pos.y + stepsize_y, sampling_pos.z));
+    float by = get_sample_data(vec3(sampling_pos.x + sampling_pos.y - stepsize_y, sampling_pos.z));
+    float cdy = fy - by;
+
+    float fz = get_sample_data(vec3(sampling_pos.x, sampling_pos.y, sampling_pos.z + stepsize_z));
+    float bz = get_sample_data(vec3(sampling_pos.x, sampling_pos.y, sampling_pos.z - stepsize_z));
+    float cdz = fz - bz;
+
+    vec3 grad;
+    grad.x = cdx;
+    grad.y = cdy;
+    grad.z = cdz;
+    return grad;
+}
+*/
+
+/*
+// Compute illumination
+vec3 compute_lighting(vec3 sampling_pos) {
+    vec3 ka = light_ambient_color;      // light ambient
+    vec3 kd = light_diffuse_color;      // light diffuse
+    vec3 ks = light_specular_color;     // light specular
+
+    // get the gradient
+    vec3 N = normalize(get_gradient(sampling_pos));
+
+    // which is the direction vector from the point on the surface toward each light source
+    vec3 lm;        
+    lm.x = light_position.x - sampling_pos.x;
+    lm.y = light_position.y - sampling_pos.y;
+    lm.z = light_position.z - sampling_pos.z;
+    lm = normalize(lm);
+
+    vec3 eye = normalize(camera_location-sampling_pos);
+
+    // direction vector
+    vec3 Rm;
+    Rm = 2 * (dot(lm,N)) * N - lm;
+
+
+    // illumination of each surface point
+    vec3 Ip;
+    Ip = ka  + kd * clamp(dot(lm, N), 0, 1) + ks * pow(( clamp(dot(Rm,-eye), 0, 1)),light_ref_coef);
+
+    return Ip;
+}
+*/
+
 void main()
 {
     /// One step trough the volume
@@ -138,6 +197,9 @@ void main()
     vec4 hit_val = vec4(0.0, 0.0, 0.0, 0.0);
     int count = 0;
 
+    //bool sign_val;
+    //bool old_sign;
+
     while (inside_volume)
     {
         // get sample
@@ -149,23 +211,87 @@ void main()
         // apply the transfer functions to retrieve color and opacity
         vec4 color = texture(transfer_texture, vec2(s, s));
 
+        /*
+        sign_val = s - iso_value < 0.0;
+
+        if (sign_val != old_sign) {
+        dst = color;
+        break;
+        }
+        */
+
         // increment the ray sampling position
         sampling_pos += ray_increment;
 
-        if(count == 0){
+        if(count == 0) {
             hit_val = color;
+            break;
         }
         count ++;
 
         #if TASK == 13 // Binary Search
                 IMPLEMENT;
+                /*
+                while (inside_volume) {
+                float s = get_sample_data(sampling_pos);
+                float steps = 1;
+
+                if (s > iso_value) {
+                    while (steps < 16) {
+                        s = get_sample_data(sampling_pos);
+                        ray_increment = ray_increment / 2;
+                        if (s > iso_value) {
+                            sampling_pos += -1 * ray_increment;
+                        }
+                        else {
+                            sampling_pos += 1 * ray_increment;
+                        }
+                        steps++;
+                    }
+                    vec4 color = texture(transfer_texture, vec2(s,s));
+                    dst = color;
+                    break;
+                }
+                // increment the ray sampling position
+                sampling_pos += ray_increment;
+
+                // update the loop termination condition
+                inside_volume = inside_volume_bounds(sampling_pos);
+                }
+                */
         #endif
 
         #if ENABLE_LIGHTNING == 1 // Add Shading
                 IMPLEMENTLIGHT;
+                /*
+                dst = vec4(compute_lighting(sampling_pos), 1.0);
+                */;
 
         #if ENABLE_SHADOWING == 1 // Add Shadows
                 IMPLEMENTSHADOW;
+                /*
+                if (ENABLE_LIGHTNING == 1) {
+                    vec3 sample_path_to_sun = normalize(sampling_pos - light_position) * sampling_distance;
+
+                    // increment the ray sampling position
+                    sampling_pos += ray_increment;
+
+                    while(inside_volume) {
+                        float s = get_sample_data(sampling_pos);
+                        if (s > iso_value) {
+                        dst = vec4(light_ambient_color, 1.0);
+                        break;
+                        }
+                        
+                        // increment the ray sampling position
+                        sampling_pos += ray_increment;
+
+                        // update the loop termination condition
+                        inside_volume = inside_volume_bounds(sampling_pos);
+
+                    }
+                }
+                */
         #endif
         #endif
 
