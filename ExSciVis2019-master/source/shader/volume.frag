@@ -284,19 +284,79 @@ void main()
         #endif
 
         // update the loop termination condition
-        inside_volume = inside_volume_bounds(sampling_pos);
-        
+        // inside_volume = inside_volume_bounds(sampling_pos);
+        // already done above
     }
     dst = hit_val;
-#endif 
+
+#endif
 
 #if TASK == 31
     // the traversal loop,
     // termination when the sampling position is outside volume boundarys
     // another termination condition for early ray termination is added
+
+    /*
+    bool method = true;
+
+    // opacity and sample initialization
+    float trans = 1.0;
+
+    if (method == true) {
+        while (inside_volume && dst.a < 0.95) {
+        float s = get_sample_data(sampling_pos);
+        vec4 color = texture(transfer_texture, vec2(s,s));
+        if (ENABLE_OPACITY_CORRECTION == 1) {
+            color.a =1 - pow((1 - color.a), (sampling_distance_ref/sampling_distance));
+        }
+
+        // for intensity
+        dst.rgb = dst.rgb + trans * (color.rgb * color.a);
+        i] = color.rgb * color.a
+
+        // for lighting
+        if (ENABLE_LIGHTNING == 1) {
+        dst.rgb = dst.rgb + compute_lightning(sampling_pos) * color.a * (1.0 - trans);
+        }
+
+        // for transparency
+        trans = trans * (1.0 - color.a);
+        dst.a = 1.0 - trans;
+
+        sampling_pos += ray_increment;
+        inside_volume = inside_volume_bounds(sampling_pos);
+        }
+    }
+
+    else {
+        while (inside_volume) {
+        sampling_pos += ray_increment;
+        inside_volume = inside_volume_bounds(sampling_pos);
+        }
+        sampling_pos -= ray_increment;
+        inside_volume = inside_volume_bounds(sampling_pos);
+        dst = vec4(0.0, 0.0, 0.0, 1.0);
+    */
+
     while (inside_volume)
     {
         // get sample
+        /*
+        float s = get_sample_data(sampling_pos);
+        vec4 color = texture(transfer_texture, vec2(s,s));
+        dst.rgb = color.rgb * color.a + dst.rgb * (1 - color.a);
+
+        // calculate lighting
+        if (ENABLE_LIGHTNING == 1) {
+            dst.rgb = dst.rgb + compute_lightning(sampling_pos) * color.a;
+        }
+        
+        sampling_pos -= ray_increment;
+        inside_volume = inside_volume_bounds(sampling_pos);
+        
+        }
+    } */
+
 #if ENABLE_OPACITY_CORRECTION == 1 // Opacity Correction
         IMPLEMENT;
 #else
