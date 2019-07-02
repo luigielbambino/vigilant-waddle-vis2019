@@ -1,2 +1,2 @@
-# SciVis 2019
+# SciVis 2019 😂
 Sari and Luis
