@@ -40,7 +40,6 @@ bool inside_volume_bounds(const in vec3 sampling_position) {
 float get_sample_data(vec3 in_sampling_pos) {
     vec3 obj_to_tex = vec3(1.0) / max_bounds;
     return texture(volume_texture, in_sampling_pos * obj_to_tex).r;
-
 }
 
 vec3 get_gradient(vec3 sampling_pos) {
@@ -48,9 +47,9 @@ vec3 get_gradient(vec3 sampling_pos) {
     vec3 p = sampling_pos;
     vec3 voxel_size = max_bounds / volume_dimensions;
 
-	D.x = get_sample_data(vec3(p.x+voxel_size.x, p.y, p.z))- get_sample_data(vec3(p.x-voxel_size.x, p.y, p.z));
-	D.y = get_sample_data(vec3(p.x, p.y+voxel_size.y, p.z))- get_sample_data(vec3(p.x, p.y-voxel_size.y, p.z));
-	D.z = get_sample_data(vec3(p.x, p.y, p.z +voxel_size.z)) - get_sample_data(vec3(p.x, p.y, p.z -voxel_size.z));
+	D.x = get_sample_data(vec3(p.x + voxel_size.x, p.y, p.z)) - get_sample_data(vec3(p.x - voxel_size.x, p.y, p.z));
+	D.y = get_sample_data(vec3(p.x, p.y + voxel_size.y, p.z)) - get_sample_data(vec3(p.x, p.y - voxel_size.y, p.z));
+	D.z = get_sample_data(vec3(p.x, p.y, p.z + voxel_size.z)) - get_sample_data(vec3(p.x, p.y, p.z - voxel_size.z));
 
     return normalize(D);
 }
