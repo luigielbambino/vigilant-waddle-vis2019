@@ -181,17 +181,20 @@ dst /= counter;
         		vec3 mirrorRef;
         		vec3 illumination;
 				float specAngle;
-        	
+        		
+        		// To normalize get_gradient() value
         		vec3 posGradient = normalize(get_gradient(sampling_pos));
+
+        		// Calculate & normalize light direction
 				lightDir = light_position - sampling_pos;
         		lightDir = normalize(lightDir);
         	
         		vec3 camPosition = normalize(camera_location - sampling_pos);
-        		mirrorRef = 2 * (dot(lightDir,posGradient))* posGradient - lightDir;
+        		mirrorRef = 2 * (dot(lightDir, posGradient)) * posGradient - lightDir;
 
-				illumination = ambient + diffuse * clamp(dot(lightDir,posGradient),0,1) + specular *  	pow((clamp(dot(mirrorRef,-camPosition),0,1)), light_ref_coef);
+				illumination = ambient + diffuse * clamp(dot(lightDir, posGradient), 0, 1) + specular * pow((clamp (dot (mirrorRef, -camPosition), 0, 1)), light_ref_coef);
         
-				dst = vec4(illumination,1.0);
+				dst = vec4(illumination, 1.0);
 			#endif
 
 			#if ENABLE_SHADOWING == 1 // Add Shadows
@@ -201,10 +204,10 @@ dst /= counter;
         	break;
 		}
 
-    // increment the ray sampling position
-    sampling_pos += ray_increment;
+    	// increment the ray sampling position
+    	sampling_pos += ray_increment;
 
-    inside_volume = inside_volume_bounds(sampling_pos);
+    	inside_volume = inside_volume_bounds(sampling_pos);
 	}
 
 #endif 
