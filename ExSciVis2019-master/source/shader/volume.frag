@@ -146,54 +146,56 @@ dst /= counter;
         if(s > iso_value) {
 
 			#if TASK == 13 // Binary Search
-        	float steps = 1;
+        		float steps = 1;
        
-        	vec3 middle = vec3(0.0);
-        	vec3 end = sampling_pos;
-			vec3 start = sampling_pos - ray_increment; 
+        		vec3 middle = vec3(0.0);
+        		vec3 end = sampling_pos;
+				vec3 start = sampling_pos - ray_increment; 
             
-			while(steps < 50) {
-                //s = get_sample_data(sampling_pos);
-                middle = (start + end)/ 2;
-                s = get_sample_data(middle);
-		
-				if(s > iso_value) {
-                    end = middle;
-            	}
-           		else {
-                    start = middle;
-            	}
-                steps ++;
-                sampling_pos = middle;
-        	}
-
-        	s = get_sample_data(sampling_pos);
+				while(steps < 50) {
+                	//s = get_sample_data(sampling_pos);
+                	middle = (start + end) / 2;
+                	s = get_sample_data(middle);
+					if(s > iso_value) {
+    	                end = middle;
+        	    	}
+           			else {
+                	    start = middle;
+            		}
+                	steps ++;
+                	sampling_pos = middle;
+        		}
+        		s = get_sample_data(sampling_pos);
 			#endif
 
         	vec4 color = texture(transfer_texture, vec2(s, s));
         	dst = color;
 
 			#if ENABLE_LIGHTNING == 1 // Add Shading
-        	vec3 ambient = light_ambient_color;
-			vec3 diffuse = light_diffuse_color;
-			vec3 specular = light_specular_color;
-        	vec3 lightDir;
-        	vec3 mirrorRef;
-        	vec3 illumination;
-			float specAngle;
-        	vec3 posGradient = normalize(get_gradient(sampling_pos));
-			lightDir = light_position - sampling_pos;
-        	lightDir = normalize(lightDir);
-        	vec3 camPosition = normalize(camera_location - sampling_pos);
-        	mirrorRef = 2 * (dot(lightDir,posGradient))* posGradient - lightDir;
+        	
+        		vec3 ambient = light_ambient_color;
+				vec3 diffuse = light_diffuse_color;
+				vec3 specular = light_specular_color;
+        	
+        		vec3 lightDir;
+        		vec3 mirrorRef;
+        		vec3 illumination;
+				float specAngle;
+        	
+        		vec3 posGradient = normalize(get_gradient(sampling_pos));
+				lightDir = light_position - sampling_pos;
+        		lightDir = normalize(lightDir);
+        	
+        		vec3 camPosition = normalize(camera_location - sampling_pos);
+        		mirrorRef = 2 * (dot(lightDir,posGradient))* posGradient - lightDir;
 
-			illumination = ambient + diffuse * clamp(dot(lightDir,posGradient),0,1) + specular *  	pow((clamp(dot(mirrorRef,-camPosition),0,1)), light_ref_coef);
+				illumination = ambient + diffuse * clamp(dot(lightDir,posGradient),0,1) + specular *  	pow((clamp(dot(mirrorRef,-camPosition),0,1)), light_ref_coef);
         
-			dst = vec4(illumination,1.0);
+				dst = vec4(illumination,1.0);
 			#endif
 
 			#if ENABLE_SHADOWING == 1 // Add Shadows
-        	//IMPLEMENTSHADOW;
+        		//IMPLEMENTSHADOW;
 			#endif
 
         	break;
