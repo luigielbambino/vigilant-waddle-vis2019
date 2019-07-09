@@ -47,6 +47,8 @@ vec3 get_gradient(vec3 sampling_pos) {
     vec3 p = sampling_pos;
     vec3 voxel_size = max_bounds / volume_dimensions;
 
+    // Compute gradient based on central difference
+    // D.x = (F(x + 1, y, z) - f(x - 1, y, z)) / 2
 	D.x = get_sample_data(vec3(p.x + voxel_size.x, p.y, p.z)) - get_sample_data(vec3(p.x - voxel_size.x, p.y, p.z));
 	D.y = get_sample_data(vec3(p.x, p.y + voxel_size.y, p.z)) - get_sample_data(vec3(p.x, p.y - voxel_size.y, p.z));
 	D.z = get_sample_data(vec3(p.x, p.y, p.z + voxel_size.z)) - get_sample_data(vec3(p.x, p.y, p.z - voxel_size.z));
@@ -76,11 +78,12 @@ void main() {
         discard;
 
 #if TASK == 10
-    vec4 max_val = vec4(0.0, 0.0, 0.0, 0.0);
-    
     // the traversal loop,
     // termination when the sampling position is outside volume boundarys
     // another termination condition for early ray termination is added
+
+    vec4 max_val = vec4(0.0, 0.0, 0.0, 0.0);
+    
     while(inside_volume) {      
         // get sample
         float s = get_sample_data(sampling_pos);
@@ -109,7 +112,8 @@ void main() {
     // termination when the sampling position is outside volume boundarys
     // another termination condition for early ray termination is added
 
-        int counter = 0;
+    int counter = 0;
+	
 	while(inside_volume) {      
         counter++;
 
@@ -127,11 +131,9 @@ void main() {
         inside_volume  = inside_volume_bounds(sampling_pos);
     }
 dst /= counter;
-
 #endif
     
 #if TASK == 12 || TASK == 13
-    
     // the traversal loop,
     // termination when the sampling position is outside volume boundarys
     // another termination condition for early ray termination is added
