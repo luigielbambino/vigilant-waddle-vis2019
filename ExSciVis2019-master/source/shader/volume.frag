@@ -190,7 +190,7 @@ dst /= counter;
         		lightDir = normalize(lightDir);
         	
         		vec3 camPosition = normalize(camera_location - sampling_pos);
-        		mirrorRef = 2 * (dot(lightDir, posGradient)) * posGradient - lightDir;
+        		mirrorRef = 2 * (dot (lightDir, posGradient)) * posGradient - lightDir;
 
 				illumination = ambient + diffuse * clamp(dot(lightDir, posGradient), 0, 1) + specular * pow((clamp (dot (mirrorRef, -camPosition), 0, 1)), light_ref_coef);
         
@@ -234,7 +234,7 @@ dst /= counter;
         trans = trans * prev_trans;
         prev_trans = trans;
 
-        intensity = intensity + (trans*color.rgb*color.a);
+        intensity = intensity + (trans * color.rgb * color.a);
 
 
 		if(trans == 0.0) {
@@ -260,8 +260,8 @@ dst /= counter;
         // update the loop termination condition
         inside_volume = inside_volume_bounds(sampling_pos);
     }
-
-    dst = vec4(intensity,1.0);
+    
+    dst = vec4(intensity, 1.0);
 
 #endif 
 
@@ -287,8 +287,7 @@ dst /= counter;
     		sampling_pos -= ray_increment;
     		inside_volume = inside_volume_bounds(sampling_pos);
     	}
-
-    	dst = vec4(intensity,1.0);
+    	dst = vec4(intensity, 1.0);
 	#endif
 
 #endif
