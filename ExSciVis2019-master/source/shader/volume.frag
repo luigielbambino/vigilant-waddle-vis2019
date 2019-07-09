@@ -130,13 +130,14 @@ void main() {
         // update the loop termination condition
         inside_volume  = inside_volume_bounds(sampling_pos);
     }
-dst /= counter;
+	dst /= counter;
 #endif
     
 #if TASK == 12 || TASK == 13
     // the traversal loop,
     // termination when the sampling position is outside volume boundarys
     // another termination condition for early ray termination is added
+
     while(inside_volume) {
 
         // get sample
@@ -216,7 +217,6 @@ dst /= counter;
 #if TASK == 31
 
 	#if FRONT_TO_BACK == 1
-
     // the traversal loop,
     // termination when the sampling position is outside volume boundarys
     // another termination condition for early ray termination is added
@@ -243,29 +243,28 @@ dst /= counter;
 
 
 		#if ENABLE_OPACITY_CORRECTION == 1 // Opacity Correction
-    	//IMPLEMENT;
+    		//IMPLEMENT;
 		#else
-	 	//float s = get_sample_data(sampling_pos);
+	 		//float s = get_sample_data(sampling_pos);
 		#endif
 
     	// dummy code
     	dst = vec4(light_specular_color, 1.0);
+    	
     	// increment the ray sampling position
     	sampling_pos += ray_increment;
 
 		#if ENABLE_LIGHTNING == 1 // Add Shading
-    	//IMPLEMENT;
+    		//IMPLEMENT;
 		#endif
 
         // update the loop termination condition
         inside_volume = inside_volume_bounds(sampling_pos);
     }
-    
     dst = vec4(intensity, 1.0);
+	#endif 
 
-#endif 
-
-#else
+	#else
 
 	#if 0	
     	while(inside_volume) {
@@ -276,8 +275,8 @@ dst /= counter;
     	//sampling_pos is now at the very back of the volume
     	sampling_pos -= ray_increment;
 
-	    vec3 intensity = vec3(0.0,0.0,0.0);
-    	vec3 just_color = vec3(0.0,0.0,0.0);
+	    vec3 intensity = vec3(0.0, 0.0, 0.0);
+    	vec3 just_color = vec3(0.0, 0.0, 0.0);
 
 	    while(inside_volume) {
 			float s = get_sample_data(sampling_pos);
@@ -287,6 +286,7 @@ dst /= counter;
     		sampling_pos -= ray_increment;
     		inside_volume = inside_volume_bounds(sampling_pos);
     	}
+
     	dst = vec4(intensity, 1.0);
 	#endif
 
